@@ -1,0 +1,39 @@
+pullrequests:
+  tasks:
+    - id: pr-standards
+      config:
+        prMilestoneCheck: true
+        prBodyCheck: true
+    - id: lint-nodejs
+    - id: unit-tests-nodejs
+    - id: lines-of-code
+      config:
+        excludeFolders: node_modules
+  notifications:
+    all:
+      - id: prcomment
+
+branches:
+  master:
+    tasks:
+      - id: lines-of-code
+        config:
+          excludeFolders: node_modules
+      - id: lint-nodejs
+      - id: unit-tests-nodejs
+
+pullrequestedit:
+  tasks:
+    - id: pr-standards
+      config:
+        prMilestoneCheck: true
+        prBodyCheck: true
+releases:
+  published:
+    tasks:
+      - id: npm-publish
+      - id: release-notes
+      - id: docker-hub-publish
+    notifications:
+      all:
+        - id: slack-stampede-dev

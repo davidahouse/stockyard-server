@@ -1,0 +1,16 @@
+redis:
+  image: redis
+  container_name: stockyard-server-redis
+  expose:
+    - 6379
+
+app:
+  build: ./
+  volumes:
+    - ./:/var/www/app
+  ports:
+    - 7766:7766
+  links:
+    - redis
+  environment:
+    stockyard_redisHost: stockyard-server-redis

@@ -1,0 +1,26 @@
+extends ../layout
+include ../components/titleBar
+include ../components/tableHeader
+include ../components/tableCell
+include ../components/tableRow
+
+block content
+
+  +titleBar([{title: 'Repositories'}])
+  div(class="flex flex-wrap m-4")
+
+    table(class="table-auto w-full")
+      thead
+        tr
+          +tableHeader('Owner')
+          +tableHeader('Repository')
+      tbody
+        each repo, i in repositories
+          +tableRow('/admin/repositoryAdmin?owner=' + repo.owner + '&repository=' + repo.repository)
+            +tableCell(repo.owner)
+            +tableCell(repo.repository)
+
+
+    div(class="p-4")
+      form(class="w-full m-4" method="GET" action="/admin/enterNewRepository" encType="multipart/form-data")
+        button(class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded") Add Repository

@@ -1,0 +1,27 @@
+include sideBarSection
+include sideBarHeader
+include sideBarItem
+
+mixin sideBar(activeMenu, owners, isAdmin)
+    div(class="shadow-lg md:h-16 md:fixed md:bottom-0 md:relative md:h-screen z-10 md:flex-shrink-0 w-48")
+        div(class="md:mt-12 md:fixed md:left-0 md:top-0 content-center md:content-start text-left justify-between")
+            ul(class="list-reset flex flex-col md:flex-col py-0 md:py-3 px-1 md:px-2 text-center md:text-left mt-6")
+
+                +sideBarHeader('Repositories', 'address-book')
+                each owner, i in owners
+                    if i < (owners.length-1)
+                        +sideBarItem({title: owner, href: `/repositories?owner=`+owner})
+                    else
+                        +sideBarItem({title: owner, href: `/repositories?owner=`+owner, class: 'pb-3'})
+                        
+                if isAdmin == true
+                    +sideBarSection('Admin', 'user-cog', [
+                        {title: 'Info', href: '/admin/info'},
+                        {title: 'Server Settings', href: '/admin/serverSettings'},
+                        {title: 'API Docs', href: '/api/api-docs'},
+                        {title: 'Logout', href: '/admin/logout', class: 'pb-3'}
+                        ])
+                else
+                    +sideBarSection('Admin', 'user-cog', [
+                        {title: 'Login', href: '/admin/login', class: 'pb-3'},
+                    ])

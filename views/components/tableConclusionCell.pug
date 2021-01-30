@@ -1,0 +1,13 @@
+mixin tableConclusionCell(value)
+  if value == "success"
+    td(class="border px-2 py-2 flex")
+      div(class="align-middle")= `✅ `+value
+  else if value == "failure"
+    td(class="border px-2 py-2 flex")
+      div(class="align-middle")= `❌ `+value
+  else if value != null
+    td(class="border px-2 py-2 flex")
+      div(class="align-middle")= `⏱ ` + value
+  else
+    td(class="border px-2 py-2 flex")
+      div(class="align-middle")= ` `

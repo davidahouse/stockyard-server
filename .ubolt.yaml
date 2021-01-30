@@ -1,0 +1,20 @@
+newversion:
+  commands:
+    - npm --no-git-tag-version version $1
+    - npm install
+  description: Update the package.json with a new version
+version:
+  command: npm view stockyard-server version
+  description: Show the current version of the package
+runlocal:
+  command: bin/stockyard-server.js --config .stockyardrc-local
+  description: Run the stockyard server against a local instance of redis/postgres running in docker
+dockerpush:
+  commands:
+    - docker build -t davidahouse/stockyard-server .
+    - docker push davidahouse/stockyard-server
+    - docker build -t davidahouse/stockyard-server:$1 .
+    - docker push davidahouse/stockyard-server:$1
+tailwind:
+  command: npx tailwindcss build css/tailwind.css -o public/css/styles.css
+  description: Update the styles.css with the latest tailwind installed
