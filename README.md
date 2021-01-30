@@ -1,4 +1,4 @@
-## Stampede server
+## Stockyard server
 
 ![npm](https://img.shields.io/npm/v/stockyard-server?style=for-the-badge)
 
