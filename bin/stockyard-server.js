@@ -104,8 +104,6 @@ process.on("SIGINT", function () {
  */
 async function gracefulShutdown() {
   logger.verbose("Closing queues");
-  await notificationChannelQueue.shutdown();
-  await incomingQueue.shutdown();
   await db.stop();
   await cache.stopCache();
   await web.stop();
