@@ -31,6 +31,22 @@ async function handle(req, res, dependencies) {
     return;
   }
 
+  const contents = req.body;
+  const languages = [];
+  if (contents != null) {
+    Object.keys(contents).forEach(function (key) {
+      if (key != "SUM" && key != "header") {
+        languages.push({
+          language: key,
+          codeLines: contents[key].code,
+          blankLines: contents[key].blank,
+          numberOfFiles: contents[key].nFiles,
+          commentLines: contents[key].comment,
+        });
+      }
+    });
+  }
+
   await dependencies.db.repositories.storeRepository(owner, repository);
   await dependencies.db.branches.storeBranch(
     owner,
@@ -44,7 +60,12 @@ async function handle(req, res, dependencies) {
     branch
   );
 
-  await dependencies.db.cloc.storeCloc(owner, repository, branch, req.body);
+  await dependencies.db.linesofcode.storeLinesOfCode(
+    owner,
+    repository,
+    branch,
+    languages
+  );
 
   res.send({ status: "ok" });
 }
