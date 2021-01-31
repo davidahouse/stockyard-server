@@ -19,7 +19,7 @@ function requiresAdmin() {
  * @param {*} dependencies
  */
 async function handle(req, res, dependencies, owners) {
-  const allOwners = await dependencies.db.fetchOwners();
+  const allOwners = await dependencies.db.repositories.fetchOwners();
   const newOwners = [];
   for (let index = 0; index < allOwners.rows.length; index++) {
     if (!owners.includes(allOwners.rows[index].owner)) {
