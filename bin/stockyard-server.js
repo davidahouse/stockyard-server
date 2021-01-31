@@ -55,6 +55,8 @@ const conf = require("rc")("stockyard", {
   // Notification channels
   slackNotificationMoreInfoURL: null,
   prCommentNotificationMoreInfoURL: null,
+  // Default branch
+  defaultBranch: "main",
 });
 
 // Configure winston logging

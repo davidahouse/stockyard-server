@@ -47,7 +47,11 @@ async function handle(req, res, dependencies) {
     });
   }
 
-  await dependencies.db.repositories.storeRepository(owner, repository);
+  await dependencies.db.repositories.storeRepository(
+    owner,
+    repository,
+    dependencies.serverConfig.defaultBranch
+  );
   await dependencies.db.branches.storeBranch(
     owner,
     repository,
