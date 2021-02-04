@@ -29,11 +29,42 @@ async function handle(req, res, dependencies, owners) {
     defaultBranch = repositoryDetails.rows[0].default_branch;
   }
 
+  const linesOfCode = await fetchLinesOfCode(
+    owner,
+    repository,
+    defaultBranch,
+    dependencies
+  );
+
+  const unitTest = await fetchUnitTest(
+    owner,
+    repository,
+    defaultBranch,
+    dependencies
+  );
+
+  res.render(dependencies.viewsPath + "repositories/repositoryDetails", {
+    owners: owners,
+    isAdmin: req.validAdminSession,
+    owner: owner,
+    repository: repository,
+    branch: defaultBranch,
+    linesOfCode: linesOfCode.linesOfCode,
+    totalLinesOfCode: linesOfCode.totalLinesOfCode,
+    totalFiles: linesOfCode.totalFiles,
+    totalTests: unitTest.totalTests,
+    successTests: unitTest.successTests,
+    failedTests: unitTest.failedTests,
+    prettyMilliseconds: (ms) => (ms != null ? prettyMilliseconds(ms) : ""),
+  });
+}
+
+async function fetchLinesOfCode(owner, repository, branch, dependencies) {
   let linesOfCode = null;
   const linesOfCodeData = await dependencies.db.linesofcode.fetchLatestLinesOfCode(
     owner,
     repository,
-    defaultBranch
+    branch
   );
 
   let totalLinesOfCode = 0;
@@ -72,16 +103,45 @@ async function handle(req, res, dependencies, owners) {
     };
   }
 
-  res.render(dependencies.viewsPath + "repositories/repositoryDetails", {
-    owners: owners,
-    isAdmin: req.validAdminSession,
-    owner: owner,
-    repository: repository,
+  return {
     linesOfCode: linesOfCode,
     totalLinesOfCode: totalLinesOfCode,
     totalFiles: totalFiles,
-    prettyMilliseconds: (ms) => (ms != null ? prettyMilliseconds(ms) : ""),
-  });
+  };
+}
+
+async function fetchUnitTest(owner, repository, branch, dependencies) {
+  const unitTest = await dependencies.db.unittest.fetchLatestUnitTestSummary(
+    owner,
+    repository,
+    branch
+  );
+  if (unitTest == null) {
+    return {
+      unitTestID: null,
+      totalTests: null,
+      successTests: null,
+      failedTests: null,
+    };
+  } else {
+    let total = 0;
+    let success = 0;
+    let failed = 0;
+    unitTest.summary.forEach(function (result) {
+      total += parseInt(result.count);
+      if (result.status.toLowerCase() == "success") {
+        success += parseInt(result.count);
+      } else {
+        failed += parseInt(result.count);
+      }
+    });
+    return {
+      unitTestID: unitTest.unitTestID,
+      totalTests: total,
+      successTests: success,
+      failedTests: failed,
+    };
+  }
 }
 
 module.exports.path = path;
