@@ -43,6 +43,14 @@ async function handle(req, res, dependencies, owners) {
     dependencies
   );
 
+  const codeCoverage = await fetchCodeCoverage(
+    owner,
+    repository,
+    defaultBranch,
+    dependencies
+  );
+  console.dir(codeCoverage);
+
   res.render(dependencies.viewsPath + "repositories/repositoryDetails", {
     owners: owners,
     isAdmin: req.validAdminSession,
@@ -55,6 +63,12 @@ async function handle(req, res, dependencies, owners) {
     totalTests: unitTest.totalTests,
     successTests: unitTest.successTests,
     failedTests: unitTest.failedTests,
+    coveragePct: codeCoverage.coveragePct,
+    coverageFiles: codeCoverage.files,
+    noCoveragePct: codeCoverage.noCoveragePct,
+    noCoverageFiles: codeCoverage.noCoverageFiles,
+    goodCoveragePct: codeCoverage.goodCoveragePct,
+    goodCoverageFiles: codeCoverage.goodCoverageFiles,
     prettyMilliseconds: (ms) => (ms != null ? prettyMilliseconds(ms) : ""),
   });
 }
@@ -140,6 +154,53 @@ async function fetchUnitTest(owner, repository, branch, dependencies) {
       totalTests: total,
       successTests: success,
       failedTests: failed,
+    };
+  }
+}
+
+async function fetchCodeCoverage(owner, repository, branch, dependencies) {
+  const latest = await dependencies.db.codecoverage.fetchLatestCodeCoverageSummary(
+    owner,
+    repository,
+    branch
+  );
+  if (latest == null) {
+    return {
+      coveragePct: 0.0,
+      files: 0,
+      noCoveragePct: 0.0,
+      noCoverageFiles: 0,
+      goodCoveragePct: 0.0,
+      goodCoverageFiles: 0,
+    };
+  } else {
+    let totalFiles = 0;
+    let noCoverageFiles = 0;
+    let goodCoverageFiles = 0;
+    latest.summary.forEach(function (file) {
+      totalFiles += 1;
+      console.log(file.line_coverage);
+      if (file.line_coverage <= 0.0) {
+        noCoverageFiles += 1;
+      } else if (file.line_coverage >= 0.9) {
+        goodCoverageFiles += 1;
+      }
+    });
+    let noCoveragePct = 0;
+    if (totalFiles > 0) {
+      noCoveragePct = noCoverageFiles / totalFiles;
+    }
+    let goodCoveragePct = 0;
+    if (totalFiles > 0) {
+      goodCoveragePct = goodCoverageFiles / totalFiles;
+    }
+    return {
+      coveragePct: Math.round(latest.lineCoverage * 100),
+      files: totalFiles,
+      noCoveragePct: Math.round(noCoveragePct * 100),
+      noCoverageFiles: noCoverageFiles,
+      goodCoveragePct: Math.round(goodCoveragePct * 100),
+      goodCoverageFiles: goodCoverageFiles,
     };
   }
 }
