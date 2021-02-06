@@ -54,6 +54,9 @@ async function handle(req, res, dependencies) {
     owner,
     repository,
     branch,
+    contents.codeCoverage.lineCoverage,
+    contents.codeCoverage.executableLines,
+    contents.codeCoverage.coveredLines,
     contents.codeCoverage.targets
   );
 
