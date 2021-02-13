@@ -49,7 +49,13 @@ async function handle(req, res, dependencies, owners) {
     defaultBranch,
     dependencies
   );
-  console.dir(codeCoverage);
+
+  const imageCapture = await fetchImageCapture(
+    owner,
+    repository,
+    defaultBranch,
+    dependencies
+  );
 
   res.render(dependencies.viewsPath + "repositories/repositoryDetails", {
     owners: owners,
@@ -69,6 +75,7 @@ async function handle(req, res, dependencies, owners) {
     noCoverageFiles: codeCoverage.noCoverageFiles,
     goodCoveragePct: codeCoverage.goodCoveragePct,
     goodCoverageFiles: codeCoverage.goodCoverageFiles,
+    numberOfImages: imageCapture.numberOfImages,
     prettyMilliseconds: (ms) => (ms != null ? prettyMilliseconds(ms) : ""),
   });
 }
@@ -179,7 +186,6 @@ async function fetchCodeCoverage(owner, repository, branch, dependencies) {
     let goodCoverageFiles = 0;
     latest.summary.forEach(function (file) {
       totalFiles += 1;
-      console.log(file.line_coverage);
       if (file.line_coverage <= 0.0) {
         noCoverageFiles += 1;
       } else if (file.line_coverage >= 0.9) {
@@ -201,6 +207,23 @@ async function fetchCodeCoverage(owner, repository, branch, dependencies) {
       noCoverageFiles: noCoverageFiles,
       goodCoveragePct: Math.round(goodCoveragePct * 100),
       goodCoverageFiles: goodCoverageFiles,
+    };
+  }
+}
+
+async function fetchImageCapture(owner, repository, branch, dependencies) {
+  const latest = await dependencies.db.imagecapture.fetchLatestImageCapture(
+    owner,
+    repository,
+    branch
+  );
+  if (latest == null) {
+    return {
+      numberOfImages: 0,
+    };
+  } else {
+    return {
+      numberOfImages: latest.files.length,
     };
   }
 }
