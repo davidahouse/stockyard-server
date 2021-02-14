@@ -29,31 +29,31 @@ async function handle(req, res, dependencies, owners) {
     defaultBranch = repositoryDetails.rows[0].default_branch;
   }
 
+  let branch = defaultBranch;
+  if (req.query.branch != null) {
+    branch = req.query.branch;
+  }
+
   const linesOfCode = await fetchLinesOfCode(
     owner,
     repository,
-    defaultBranch,
+    branch,
     dependencies
   );
 
-  const unitTest = await fetchUnitTest(
-    owner,
-    repository,
-    defaultBranch,
-    dependencies
-  );
+  const unitTest = await fetchUnitTest(owner, repository, branch, dependencies);
 
   const codeCoverage = await fetchCodeCoverage(
     owner,
     repository,
-    defaultBranch,
+    branch,
     dependencies
   );
 
   const imageCapture = await fetchImageCapture(
     owner,
     repository,
-    defaultBranch,
+    branch,
     dependencies
   );
 
@@ -62,7 +62,7 @@ async function handle(req, res, dependencies, owners) {
     isAdmin: req.validAdminSession,
     owner: owner,
     repository: repository,
-    branch: defaultBranch,
+    branch: branch,
     linesOfCode: linesOfCode.linesOfCode,
     totalLinesOfCode: linesOfCode.totalLinesOfCode,
     totalFiles: linesOfCode.totalFiles,

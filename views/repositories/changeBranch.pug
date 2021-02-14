@@ -1,0 +1,36 @@
+extends ../layout
+include ../components/titleBar
+include ../components/tableHeader
+include ../components/tableCell
+include ../components/tableUnderlinedCell
+include ../components/tableRow
+include ../components/tableCellButton
+include ../components/formFile
+include ../components/formHidden
+
+block content
+
+    +titleBar([{title: 'Repositories', href: `/repositories?owner=` + owner + `&=` + repository},
+    {title: owner + ' ' + repository}])
+    div(class="flex flex-wrap m-4")
+
+        div(class="w-full p-3")
+            div(class="bg-white border-transparent rounded-lg shadow-lg")
+                div(class="bg-gray-400 uppercase text-gray-800 border-b-2 border-gray-500 rounded-tl-lg rounded-tr-lg p-2")
+                    h5(class="font-bold uppercase text-gray-600") Select Branch
+                div(class="p-5 flex")
+                    table(class="table-auto w-full")
+                        thead
+                            +tableHeader('Default Branch')
+                        tbody
+                            +tableRow(`/repositories/repositoryDetails?owner=` + owner + `&repository=` + repository + `&branch=` + defaultBranch)
+                                +tableCell(`` + defaultBranch + ` (default)`)
+
+                div(class="p-5 flex")                
+                    table(class="table-auto w-full")
+                        thead
+                            +tableHeader('Other Branches')
+                        tbody
+                            each branch, i in branches
+                                +tableRow(`/repositories/repositoryDetails?owner=` + owner + `&repository=` + repository + `&branch=` + branch.branch)
+                                    +tableCell(branch.branch)
