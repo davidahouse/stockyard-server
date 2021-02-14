@@ -101,7 +101,7 @@ block content
 				div(class="bg-gray-400 uppercase text-gray-800 border-b-2 border-gray-500 rounded-tl-lg rounded-tr-lg p-2")
 					h5(class="font-bold uppercase text-gray-600") Image Captures
 				if numberOfImages > 0
-					div(class="p-5 flex")
+					div(class="p-5 flex hover:bg-gray-300" data-href=`/repositories/imageCaptureDetails?owner=` + owner + `&repository=` + repository + `&branch=` + branch)
 						div(class="text-center w-1/3")
 							div(class="text-lg font-bold")
 								p Images Captured
