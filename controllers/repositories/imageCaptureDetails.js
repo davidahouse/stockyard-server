@@ -17,22 +17,30 @@ function path() {
 async function handle(req, res, dependencies, owners) {
   const owner = req.query.owner;
   const repository = req.query.repository;
+  let branch = req.query.branch;
 
-  const repositoryDetails = await dependencies.db.repositories.fetchRepository(
-    owner,
-    repository
-  );
-  let defaultBranch = "";
-  if (repositoryDetails == null || repositoryDetails.rows.length == 0) {
-    defaultBranch = dependencies.serverConfig.defaultBranch;
-  } else {
-    defaultBranch = repositoryDetails.rows[0].default_branch;
+  if (branch == null) {
+    const repositoryDetails = await dependencies.db.repositories.fetchRepository(
+      owner,
+      repository
+    );
+
+    if (repositoryDetails == null || repositoryDetails.rows.length == 0) {
+      branch = dependencies.serverConfig.defaultBranch;
+    } else {
+      branch = repositoryDetails.rows[0].default_branch;
+    }
   }
+
+  dependencies.logger.verbose(
+    "Image capture details for: " + owner + " / " + repository
+  );
+  dependencies.logger.verbose("Branch is: " + branch);
 
   const imageCapture = await fetchImageCapture(
     owner,
     repository,
-    defaultBranch,
+    branch,
     dependencies
   );
 
@@ -41,7 +49,7 @@ async function handle(req, res, dependencies, owners) {
     isAdmin: req.validAdminSession,
     owner: owner,
     repository: repository,
-    branch: defaultBranch,
+    branch: branch,
     images: imageCapture,
     prettyMilliseconds: (ms) => (ms != null ? prettyMilliseconds(ms) : ""),
   });
