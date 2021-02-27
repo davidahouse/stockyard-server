@@ -68,7 +68,8 @@ async function handle(req, res, dependencies) {
     owner,
     repository,
     branch,
-    languages
+    languages,
+    contents
   );
 
   res.send({ status: "ok" });
@@ -79,7 +80,7 @@ async function handle(req, res, dependencies) {
  */
 function docs() {
   return {
-    get: {
+    post: {
       summary: "cloc",
       responses: {
         200: {
