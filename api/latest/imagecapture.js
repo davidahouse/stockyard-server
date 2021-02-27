@@ -4,14 +4,14 @@
  * The url path this handler will serve
  */
 function path() {
-  return "/api/upload/imagecapture";
+  return "/api/latest/imagecapture";
 }
 
 /**
  * The http method this handler will serve
  */
 function method() {
-  return "post";
+  return "get";
 }
 
 /**
@@ -24,41 +24,17 @@ async function handle(req, res, dependencies) {
   const owner = req.query.owner;
   const repository = req.query.repository;
   const branch = req.query.branch;
-  const pullRequest = req.query.pull_request;
 
-  if (owner == null || repository == null || branch == null) {
-    res.send({ status: "missing owner, repo or branch" });
-    return;
-  }
-
-  const contents = req.body;
-
-  await dependencies.db.repositories.storeRepository(
-    owner,
-    repository,
-    dependencies.serverConfig.defaultBranch
-  );
-  await dependencies.db.branches.storeBranch(
-    owner,
-    repository,
-    branch,
-    pullRequest
-  );
-  await dependencies.db.branches.updateBranchActivity(
+  const imageCaptureData = await dependencies.db.imagecapture.fetchLatestRawImageCapture(
     owner,
     repository,
     branch
   );
-
-  await dependencies.db.imagecapture.storeImageCapture(
-    owner,
-    repository,
-    branch,
-    contents.images,
-    contents
-  );
-
-  res.send({ status: "ok" });
+  if (imageCaptureData != null) {
+    res.send(imageCaptureData);
+  } else {
+    res.send({});
+  }
 }
 
 /**
@@ -66,7 +42,7 @@ async function handle(req, res, dependencies) {
  */
 function docs() {
   return {
-    post: {
+    get: {
       summary: "imagecapture",
       responses: {
         200: {

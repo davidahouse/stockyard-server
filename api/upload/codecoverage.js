@@ -57,7 +57,8 @@ async function handle(req, res, dependencies) {
     contents.codeCoverage.lineCoverage,
     contents.codeCoverage.executableLines,
     contents.codeCoverage.coveredLines,
-    contents.codeCoverage.targets
+    contents.codeCoverage.targets,
+    contents
   );
 
   res.send({ status: "ok" });
@@ -68,7 +69,7 @@ async function handle(req, res, dependencies) {
  */
 function docs() {
   return {
-    get: {
+    post: {
       summary: "codecoverage",
       responses: {
         200: {
