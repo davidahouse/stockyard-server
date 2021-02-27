@@ -17,24 +17,27 @@ function path() {
 async function handle(req, res, dependencies, owners) {
   const owner = req.query.owner;
   const repository = req.query.repository;
+  let branch = req.query.branch;
 
-  const repositoryDetails = await dependencies.db.repositories.fetchRepository(
-    owner,
-    repository
-  );
-  let defaultBranch = "";
-  if (repositoryDetails == null || repositoryDetails.rows.length == 0) {
-    defaultBranch = dependencies.serverConfig.defaultBranch;
-  } else {
-    defaultBranch = repositoryDetails.rows[0].default_branch;
+  if (branch == null) {
+    const repositoryDetails = await dependencies.db.repositories.fetchRepository(
+      owner,
+      repository
+    );
+
+    if (repositoryDetails == null || repositoryDetails.rows.length == 0) {
+      branch = dependencies.serverConfig.defaultBranch;
+    } else {
+      branch = repositoryDetails.rows[0].default_branch;
+    }
   }
 
-  const unitTest = await fetchUnitTest(
-    owner,
-    repository,
-    defaultBranch,
-    dependencies
+  dependencies.logger.verbose(
+    "Unit test details for: " + owner + " / " + repository
   );
+  dependencies.logger.verbose("Branch is: " + branch);
+
+  const unitTest = await fetchUnitTest(owner, repository, branch, dependencies);
 
   const testCases = await dependencies.db.unittest.fetchTestExecutionDetails(
     unitTest.unitTestID
@@ -45,7 +48,7 @@ async function handle(req, res, dependencies, owners) {
     isAdmin: req.validAdminSession,
     owner: owner,
     repository: repository,
-    branch: defaultBranch,
+    branch: branch,
     totalTests: unitTest.totalTests,
     successTests: unitTest.successTests,
     failedTests: unitTest.failedTests,
