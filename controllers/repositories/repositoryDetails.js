@@ -252,9 +252,11 @@ async function fetchImageCaptureDiff(owner, repository, branch, dependencies) {
     };
   } else {
     return {
-      newCount: latest.raw_json.new.length,
-      changedCount: latest.raw_json.changed.length,
-      removedCount: latest.raw_json.removed.length,
+      newCount: latest.raw_json.new != null ? latest.raw_json.new.length : 0,
+      changedCount:
+        latest.raw_json.changed != null ? latest.raw_json.changed.length : 0,
+      removedCount:
+        latest.raw_json.removed != null ? latest.raw_json.removed.length : 0,
     };
   }
 }
