@@ -57,6 +57,13 @@ async function handle(req, res, dependencies, owners) {
     dependencies
   );
 
+  const imageCaptureDiff = await fetchImageCaptureDiff(
+    owner,
+    repository,
+    branch,
+    dependencies
+  );
+
   res.render(dependencies.viewsPath + "repositories/repositoryDetails", {
     owners: owners,
     isAdmin: req.validAdminSession,
@@ -76,6 +83,9 @@ async function handle(req, res, dependencies, owners) {
     goodCoveragePct: codeCoverage.goodCoveragePct,
     goodCoverageFiles: codeCoverage.goodCoverageFiles,
     numberOfImages: imageCapture.numberOfImages,
+    imageCaptureDiffNewCount: imageCaptureDiff.newCount,
+    imageCaptureDiffChangedCount: imageCaptureDiff.changedCount,
+    imageCaptureDiffRemovedCount: imageCaptureDiff.removedCount,
     prettyMilliseconds: (ms) => (ms != null ? prettyMilliseconds(ms) : ""),
   });
 }
@@ -224,6 +234,27 @@ async function fetchImageCapture(owner, repository, branch, dependencies) {
   } else {
     return {
       numberOfImages: latest.files.length,
+    };
+  }
+}
+
+async function fetchImageCaptureDiff(owner, repository, branch, dependencies) {
+  const latest = await dependencies.db.imagecapturediff.fetchLatestImageCaptureDiff(
+    owner,
+    repository,
+    branch
+  );
+  if (latest == null) {
+    return {
+      newCount: 0,
+      changedCount: 0,
+      removedCount: 0,
+    };
+  } else {
+    return {
+      newCount: latest.raw_json.new.length,
+      changedCount: latest.raw_json.changed.length,
+      removedCount: latest.raw_json.removed.length,
     };
   }
 }
