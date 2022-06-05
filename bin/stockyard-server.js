@@ -18,7 +18,7 @@ const notification = require("../services/notification");
 
 const thirtySeconds = 1000 * 30;
 const fiveMinuteInterval = 1000 * 60 * 5;
-const conf = require("rc")("stockyard", {
+const conf = require("rc-house")("stockyard", {
   // redis
   redisHost: "localhost",
   redisPort: 6379,
